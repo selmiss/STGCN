@@ -175,7 +175,7 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, sav
 
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
-        checkpoint_name = val_loss + "_weights.pth"
+        checkpoint_name = str(val_loss) + "_weights.pth"
         save_path = os.path.join(save_dir, checkpoint_name)
         torch.save(model.state_dict(), save_path)
 
@@ -221,6 +221,7 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
-    load_model_from_checkpoint(model, 'checkpoints/a.pth')
-    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter)
+    # load_model_from_checkpoint(model, 'checkpoints/a.pth')
+    # train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter)
+
     test(zscore, loss, model, test_iter, args)
