@@ -154,7 +154,10 @@ def prepare_model(args, blocks, n_vertex):
     return loss, es, model, optimizer, scheduler
 
 
-def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, save_dir='/checkpoints'):
+def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, save_dir='./checkpoints'):
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
+    lost_least = 10
     for epoch in range(args.epochs):
         l_sum, n = 0.0, 0  # 'l_sum' is epoch sum loss, 'n' is epoch instance number
         model.train()
@@ -173,11 +176,11 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, sav
         print('Epoch: {:03d} | Lr: {:.20f} |Train loss: {:.6f} | Val loss: {:.6f} | GPU occupy: {:.6f} MiB'.\
             format(epoch+1, optimizer.param_groups[0]['lr'], l_sum / n, val_loss, gpu_mem_alloc))
 
-        if not os.path.exists(save_dir):
-            os.mkdir(save_dir)
-        checkpoint_name = str(val_loss) + "_weights.pth"
-        save_path = os.path.join(save_dir, checkpoint_name)
-        torch.save(model.state_dict(), save_path)
+        if val_loss < lost_least:
+            checkpoint_name = str(val_loss) + "_weights.pth"
+            lost_least = val_loss
+            save_path = os.path.join(save_dir, checkpoint_name)
+            torch.save(model.state_dict(), save_path)
 
         if es.step(val_loss):
             print('Early stopping.')
