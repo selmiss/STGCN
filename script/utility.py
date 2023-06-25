@@ -77,6 +77,7 @@ def calc_chebynet_gso(gso):
 
     return gso
 
+
 def cnv_sparse_mat_to_coo_tensor(sp_mat, device):
     # convert a compressed sparse row (csr) or compressed sparse column (csc) matrix to a hybrid sparse coo tensor
     sp_coo_mat = sp_mat.tocoo()
@@ -88,6 +89,7 @@ def cnv_sparse_mat_to_coo_tensor(sp_mat, device):
         return torch.sparse_coo_tensor(indices=i, values=v, size=s, dtype=torch.float32, device=device, requires_grad=False)
     else:
         raise TypeError(f'ERROR: The dtype of {sp_mat} is {sp_mat.dtype}, not been applied in implemented models.')
+
 
 def evaluate_model(model, loss, data_iter):
     model.eval()
@@ -101,6 +103,7 @@ def evaluate_model(model, loss, data_iter):
         mse = l_sum / n
         
         return mse
+
 
 def evaluate_metric(model, data_iter, scaler):
     model.eval()
