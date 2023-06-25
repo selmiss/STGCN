@@ -99,7 +99,6 @@ def evaluate_model(model, loss, data_iter):
         # y.shape = torch.Size([32, 207])
         # model(x).shape = torch.Size([32, 1, 1, 207])
         for x, y in data_iter:
-            print(model(x).shape)
             y_pred = model(x).view(len(x), -1)
             l = loss(y_pred, y)
             l_sum += l.item() * y.shape[0]
