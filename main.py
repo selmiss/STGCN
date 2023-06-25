@@ -172,9 +172,13 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, sav
         gpu_mem_alloc = torch.cuda.max_memory_allocated() / 1000000 if torch.cuda.is_available() else 0
         print('Epoch: {:03d} | Lr: {:.20f} |Train loss: {:.6f} | Val loss: {:.6f} | GPU occupy: {:.6f} MiB'.\
             format(epoch+1, optimizer.param_groups[0]['lr'], l_sum / n, val_loss, gpu_mem_alloc))
+
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
         checkpoint_name = val_loss + "_weights.pth"
         save_path = os.path.join(save_dir, checkpoint_name)
         torch.save(model.state_dict(), save_path)
+
         if es.step(val_loss):
             print('Early stopping.')
             break
@@ -200,6 +204,14 @@ def test(zscore, loss, model, test_iter, args):
     print(f'Dataset {args.dataset:s} | Test loss {test_MSE:.6f} | MAE {test_MAE:.6f} | RMSE {test_RMSE:.6f} | WMAPE {test_WMAPE:.8f}')
 
 
+def load_model_from_checkpoint(model, ckp_path):
+    if os.path.exists(ckp_path):
+        torch.load(model.load_state_dict(), ckp_path)
+        print('load model checkpoint from', ckp_path)
+    else:
+        print(ckp_path, 'file not exist')
+
+
 if __name__ == "__main__":
     # Logging
     #logger = logging.getLogger('stgcn')
@@ -209,5 +221,6 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
+    
     train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter)
     test(zscore, loss, model, test_iter, args)
