@@ -16,7 +16,6 @@ import torch.utils as utils
 from script import dataloader, utility, earlystopping
 from model import models
 
-#import nni
 
 def set_env(seed):
     # Set available CUDA devices
@@ -34,6 +33,7 @@ def set_env(seed):
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
     torch.use_deterministic_algorithms(True)
+
 
 def get_parameters():
     parser = argparse.ArgumentParser(description='STGCN')
@@ -130,6 +130,7 @@ def data_preparate(args, device):
 
     return n_vertex, zscore, train_iter, val_iter, test_iter
 
+
 def prepare_model(args, blocks, n_vertex):
     loss = nn.MSELoss()
     es = earlystopping.EarlyStopping(mode='min', min_delta=0.0, patience=args.patience)
@@ -152,7 +153,8 @@ def prepare_model(args, blocks, n_vertex):
 
     return loss, es, model, optimizer, scheduler
 
-def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter):
+
+def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, save_dir='/checkpoints'):
     for epoch in range(args.epochs):
         l_sum, n = 0.0, 0  # 'l_sum' is epoch sum loss, 'n' is epoch instance number
         model.train()
@@ -170,10 +172,13 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter):
         gpu_mem_alloc = torch.cuda.max_memory_allocated() / 1000000 if torch.cuda.is_available() else 0
         print('Epoch: {:03d} | Lr: {:.20f} |Train loss: {:.6f} | Val loss: {:.6f} | GPU occupy: {:.6f} MiB'.\
             format(epoch+1, optimizer.param_groups[0]['lr'], l_sum / n, val_loss, gpu_mem_alloc))
-
+        checkpoint_name = val_loss + "_weights.pth"
+        save_path = os.path.join(save_dir, checkpoint_name)
+        torch.save(model.state_dict(), save_path)
         if es.step(val_loss):
             print('Early stopping.')
             break
+
 
 @torch.no_grad()
 def val(model, val_iter):
@@ -186,12 +191,14 @@ def val(model, val_iter):
         n += y.shape[0]
     return torch.tensor(l_sum / n)
 
+
 @torch.no_grad() 
 def test(zscore, loss, model, test_iter, args):
     model.eval()
     test_MSE = utility.evaluate_model(model, loss, test_iter)
     test_MAE, test_RMSE, test_WMAPE = utility.evaluate_metric(model, test_iter, zscore)
     print(f'Dataset {args.dataset:s} | Test loss {test_MSE:.6f} | MAE {test_MAE:.6f} | RMSE {test_RMSE:.6f} | WMAPE {test_WMAPE:.8f}')
+
 
 if __name__ == "__main__":
     # Logging
