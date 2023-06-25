@@ -22,6 +22,7 @@ class Align(nn.Module):
         
         return x
 
+
 class CausalConv1d(nn.Conv1d):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, enable_padding=False, dilation=1, groups=1, bias=True):
         if enable_padding == True:
@@ -36,6 +37,7 @@ class CausalConv1d(nn.Conv1d):
             return result[: , : , : -self.__padding]
         
         return result
+
 
 class CausalConv2d(nn.Conv2d):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, enable_padding=False, dilation=1, groups=1, bias=True):

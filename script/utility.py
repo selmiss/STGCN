@@ -96,10 +96,11 @@ def evaluate_model(model, loss, data_iter):
     l_sum, n = 0.0, 0
     with torch.no_grad():
         # x.shape = torch.Size([32, 1, 12, 207])
-        # y.shape = torch.Size([32, 207])
+        # y.shape, y_predict = torch.Size([32, 207])
         # model(x).shape = torch.Size([32, 1, 1, 207])
         for x, y in data_iter:
             y_pred = model(x).view(len(x), -1)
+            # print(y_pred[0][0], y[0][0])
             l = loss(y_pred, y)
             l_sum += l.item() * y.shape[0]
             n += y.shape[0]

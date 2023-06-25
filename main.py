@@ -112,12 +112,17 @@ def data_preparate(args, device):
     len_train = int(data_col - len_val - len_test)
 
     train, val, test = dataloader.load_data(args.dataset, len_train, len_val)
+    # (23991, 207) raw data
+
     zscore = preprocessing.StandardScaler()
+    # (23991, 207) standard data
     train = zscore.fit_transform(train)
     val = zscore.transform(val)
     test = zscore.transform(test)
 
     x_train, y_train = dataloader.data_transform(train, args.n_his, args.n_pred, device)
+    # print(x_train.shape, y_train.shape, y_train[0])
+    # torch.Size([23976, 1, 12, 207]) torch.Size([23976, 207])
     x_val, y_val = dataloader.data_transform(val, args.n_his, args.n_pred, device)
     x_test, y_test = dataloader.data_transform(test, args.n_his, args.n_pred, device)
 
@@ -209,7 +214,8 @@ def test(zscore, loss, model, test_iter, args):
 
 def load_model_from_checkpoint(model, ckp_path):
     if os.path.exists(ckp_path):
-        torch.load(model.load_state_dict(), ckp_path)
+        checkpoint = torch.load(ckp_path)
+        model.load_state_dict(checkpoint)
         print('load model checkpoint from', ckp_path)
     else:
         print(ckp_path, 'file not exist')
@@ -224,7 +230,7 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
-    # load_model_from_checkpoint(model, 'checkpoints/a.pth')
+    load_model_from_checkpoint(model, 'checkpoints/a.pth')
     train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter)
 
     test(zscore, loss, model, test_iter, args)
