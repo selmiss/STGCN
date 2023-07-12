@@ -182,7 +182,7 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, sav
             format(epoch+1, optimizer.param_groups[0]['lr'], l_sum / n, val_loss, gpu_mem_alloc))
 
         if val_loss < lost_least:
-            checkpoint_name = str(val_loss.item()) + args.dataset + ".pth"
+            checkpoint_name = str(round(val_loss.item(),4)) + "_" + args.dataset + ".pth"
             lost_least = val_loss
             save_path = os.path.join(save_dir, checkpoint_name)
             torch.save(model.state_dict(), save_path)
@@ -234,8 +234,8 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
-    load_model_from_checkpoint(model, 'checkpoints/tensor(0.2687)_weights.pth')
+    # load_model_from_checkpoint(model, 'checkpoints/tensor(0.2687)_weights.pth')
 
-    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./ori_200_metr_la")
+    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/ori200")
 
     test(zscore, loss, model, test_iter, args)
