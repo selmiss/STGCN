@@ -136,14 +136,14 @@ def data_preparate(args, device):
     return n_vertex, zscore, train_iter, val_iter, test_iter
 
 
-def prepare_model(args, blocks, n_vertex):
+def prepare_model(args, blocks, n_vertex, n_internal=200):
     loss = nn.MSELoss()
     es = earlystopping.EarlyStopping(mode='min', min_delta=0.0, patience=args.patience)
 
     if args.graph_conv_type == 'cheb_graph_conv':
-        model = models.STGCNChebGraphConv(args, blocks, n_vertex).to(device)
+        model = models.STGCNChebGraphConv(args, blocks, n_internal, n_vertex).to(device)
     else:
-        model = models.STGCNGraphConv(args, blocks, n_vertex).to(device)
+        model = models.STGCNGraphConv(args, blocks, n_internal, n_vertex).to(device)
 
     if args.opt == "rmsprop":
         optimizer = optim.RMSprop(model.parameters(), lr=args.lr, weight_decay=args.weight_decay_rate)
