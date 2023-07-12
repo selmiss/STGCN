@@ -234,7 +234,8 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
-    load_model_from_checkpoint(model, './checkpoints/tensor(0.2687)_weights.pth')
+    load_model_from_checkpoint(model, 'checkpoints/tensor(0.2687)_weights.pth')
+
     # train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter)
 
     test(zscore, loss, model, test_iter, args)
