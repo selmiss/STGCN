@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn import preprocessing
 from PIL import Image
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -95,10 +96,15 @@ def data_preparate(args, device):
     adj, n_vertex = dataloader.load_adj(args.dataset)
 
     img = adj.A
-    
     gso_image = Image.fromarray(img * 255)
-    gso_image.show()
+
+    plt.figure()
+    plt.subplot(1, 2, 1)
+    plt.imshow(gso_image)
     gso_image = gso_image.resize((200, 200))
+    plt.subplot(1, 2, 2)
+    plt.imshow(gso_image)
+    plt.show()
     img_arr = np.asarray(gso_image) / 255
     adj = sparse.csr_matrix(img_arr)
 
