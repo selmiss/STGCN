@@ -234,8 +234,8 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
-    # load_model_from_checkpoint(model, 'checkpoints/tensor(0.2687)_weights.pth')
+    # load_model_from_checkpoint(model, 'checkpoints/ori200/0.2615_metr-la.pth')
 
-    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/ori200")
+    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/ori200encoder")
 
     test(zscore, loss, model, test_iter, args)
