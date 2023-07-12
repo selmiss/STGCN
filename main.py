@@ -44,8 +44,8 @@ def get_parameters():
     parser.add_argument('--n_his', type=int, default=12)
     parser.add_argument('--n_pred', type=int, default=3, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
-    parser.add_argument('--Kt', type=int, default=3)
-    parser.add_argument('--stblock_num', type=int, default=2)
+    parser.add_argument('--Kt', type=int, default=2)
+    parser.add_argument('--stblock_num', type=int, default=3)
     parser.add_argument('--act_func', type=str, default='glu', choices=['glu', 'gtu'])
     parser.add_argument('--Ks', type=int, default=3, choices=[3, 2])
     parser.add_argument('--graph_conv_type', type=str, default='cheb_graph_conv', choices=['cheb_graph_conv', 'graph_conv'])
@@ -102,7 +102,7 @@ def data_preparate(args, device):
     plt.figure()
     plt.subplot(1, 2, 1)
     plt.imshow(gso_image)
-    gso_image = gso_image.resize((200, 200))
+    # gso_image = gso_image.resize((200, 200))
     plt.subplot(1, 2, 2)
     plt.imshow(gso_image)
     plt.show()
@@ -154,7 +154,7 @@ def data_preparate(args, device):
     return n_vertex, zscore, train_iter, val_iter, test_iter
 
 
-def prepare_model(args, blocks, n_vertex, n_internal=200):
+def prepare_model(args, blocks, n_vertex, n_internal=207):
     loss = nn.MSELoss()
     es = earlystopping.EarlyStopping(mode='min', min_delta=0.0, patience=args.patience)
 

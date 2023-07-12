@@ -49,7 +49,7 @@ class STGCNChebGraphConv(nn.Module):
             self.dropout = nn.Dropout(p=args.droprate)
 
     def forward(self, x):
-        x = self.encoder(x)
+        # x = self.encoder(x)
         x = self.st_blocks(x)
         if self.Ko > 1:
             x = self.output(x)
@@ -57,7 +57,7 @@ class STGCNChebGraphConv(nn.Module):
             x = self.fc1(x.permute(0, 2, 3, 1))
             x = self.relu(x)
             x = self.fc2(x).permute(0, 3, 1, 2)
-        x = self.decoder(x)
+        # x = self.decoder(x)
         return x
 
 class STGCNGraphConv(nn.Module):
