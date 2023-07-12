@@ -6,10 +6,10 @@ class encoder(nn.Module):
     def __init__(self, input_size, hidden_size):
         super(encoder, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Linear(input_size, 256),
-            nn.ReLU(),
-            nn.Linear(256, hidden_size),
-            nn.ReLU()
+            nn.Linear(input_size, hidden_size),
+            # nn.ReLU(),
+            # nn.Linear(256, hidden_size),
+            # nn.ReLU()
         )
 
     def forward(self, x):
@@ -21,10 +21,10 @@ class decoder(nn.Module):
     def __init__(self, hidden_size, input_size):
         super(decoder, self).__init__()
         self.decoder = nn.Sequential(
-            nn.Linear(hidden_size, 256),
-            nn.ReLU(),
-            nn.Linear(256, input_size),
-            nn.ReLU()
+            nn.Linear(hidden_size, input_size),
+            # nn.ReLU(),
+            # nn.Linear(256, input_size),
+            # nn.ReLU()
         )
 
     def forward(self, x):
