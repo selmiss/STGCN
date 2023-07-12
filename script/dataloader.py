@@ -19,6 +19,7 @@ def load_adj(dataset_name):
 
     return adj, n_vertex
 
+
 def load_data(dataset_name, len_train, len_val):
     dataset_path = './data'
     dataset_path = os.path.join(dataset_path, dataset_name)
@@ -28,6 +29,7 @@ def load_data(dataset_name, len_train, len_val):
     val = vel[len_train: len_train + len_val]
     test = vel[len_train + len_val:]
     return train, val, test
+
 
 def data_transform(data, n_his, n_pred, device):
     # produce data slices for x_data and y_data

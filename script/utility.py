@@ -2,6 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import norm
 import torch
+import tqdm
 
 def calc_gso(dir_adj, gso_type):
     n_vertex = dir_adj.shape[0]
@@ -94,18 +95,17 @@ def cnv_sparse_mat_to_coo_tensor(sp_mat, device):
 def evaluate_model(model, loss, data_iter):
     model.eval()
     l_sum, n = 0.0, 0
+
     with torch.no_grad():
         # x.shape = torch.Size([32, 1, 12, 207])
         # y.shape, y_predict = torch.Size([32, 207])
         # model(x).shape = torch.Size([32, 1, 1, 207])
-        for x, y in data_iter:
+        for x, y in tqdm.tqdm(data_iter):
             y_pred = model(x).view(len(x), -1)
-            # print(y_pred[0][0], y[0][0])
             l = loss(y_pred, y)
             l_sum += l.item() * y.shape[0]
             n += y.shape[0]
         mse = l_sum / n
-        
         return mse
 
 
@@ -113,7 +113,7 @@ def evaluate_metric(model, data_iter, scaler):
     model.eval()
     with torch.no_grad():
         mae, sum_y, mape, mse = [], [], [], []
-        for x, y in data_iter:
+        for x, y in tqdm.tqdm(data_iter):
             y = scaler.inverse_transform(y.cpu().numpy()).reshape(-1)
             y_pred = scaler.inverse_transform(model(x).view(len(x), -1).cpu().numpy()).reshape(-1)
             d = np.abs(y - y_pred)
@@ -128,3 +128,18 @@ def evaluate_metric(model, data_iter, scaler):
 
         #return MAE, MAPE, RMSE
         return MAE, RMSE, WMAPE
+
+
+def evaluate_graph(model, data_iter, scaler):
+    model.eval()
+    with torch.no_grad():
+        y_list = []
+        y_pred_list = []
+        for x, y in tqdm.tqdm(data_iter):
+            y = scaler.inverse_transform(y.cpu().numpy())
+            y_pred = scaler.inverse_transform(model(x).view(len(x), -1).cpu().numpy())
+            for i in range(min(32, len(y))):
+                y_list.append(y[i][0])
+                y_pred_list.append(y_pred[i][0])
+        np.savetxt('./result/y_pred_list.txt', y_pred_list)
+        np.savetxt('./result/y_list.txt', y_list)

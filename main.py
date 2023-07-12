@@ -209,12 +209,16 @@ def test(zscore, loss, model, test_iter, args):
     model.eval()
     test_MSE = utility.evaluate_model(model, loss, test_iter)
     test_MAE, test_RMSE, test_WMAPE = utility.evaluate_metric(model, test_iter, zscore)
+    # utility.evaluate_graph(model, test_iter, zscore)
     print(f'Dataset {args.dataset:s} | Test loss {test_MSE:.6f} | MAE {test_MAE:.6f} | RMSE {test_RMSE:.6f} | WMAPE {test_WMAPE:.8f}')
 
 
 def load_model_from_checkpoint(model, ckp_path):
     if os.path.exists(ckp_path):
-        checkpoint = torch.load(ckp_path)
+        if torch.cuda.is_available():
+            checkpoint = torch.load(ckp_path)
+        else:
+            checkpoint = torch.load(ckp_path, map_location=torch.device('cpu'))
         model.load_state_dict(checkpoint)
         print('load model checkpoint from', ckp_path)
     else:
@@ -230,7 +234,7 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
-    load_model_from_checkpoint(model, 'checkpoints/a.pth')
-    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter)
+    load_model_from_checkpoint(model, './checkpoints/tensor(0.2687)_weights.pth')
+    # train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter)
 
     test(zscore, loss, model, test_iter, args)
