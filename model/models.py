@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 
-from model import layers
+from model import layers, encoder
+
 
 class STGCNChebGraphConv(nn.Module):
     # STGCNChebGraphConv contains 'TGTND TGTND TNFF' structure
@@ -25,9 +26,13 @@ class STGCNChebGraphConv(nn.Module):
     # F: Fully-Connected Layer
     # F: Fully-Connected Layer
 
-    def __init__(self, args, blocks, n_vertex):
+    def __init__(self, args, blocks, n_vertex, n_internal):
         super(STGCNChebGraphConv, self).__init__()
         modules = []
+        # Add an encoder
+        self.encoder = encoder.encoder(n_vertex, n_internal)
+        self.decoder = encoder.decoder(n_internal, n_vertex)
+
         for l in range(len(blocks) - 3):
             modules.append(layers.STConvBlock(args.Kt, args.Ks, n_vertex, blocks[l][-1], blocks[l+1], args.act_func, args.graph_conv_type, args.gso, args.enable_bias, args.droprate))
         self.st_blocks = nn.Sequential(*modules)
@@ -44,6 +49,7 @@ class STGCNChebGraphConv(nn.Module):
             self.dropout = nn.Dropout(p=args.droprate)
 
     def forward(self, x):
+        x = self.encoder(x)
         x = self.st_blocks(x)
         if self.Ko > 1:
             x = self.output(x)
@@ -51,7 +57,7 @@ class STGCNChebGraphConv(nn.Module):
             x = self.fc1(x.permute(0, 2, 3, 1))
             x = self.relu(x)
             x = self.fc2(x).permute(0, 3, 1, 2)
-        
+        x = self.decoder(x)
         return x
 
 class STGCNGraphConv(nn.Module):

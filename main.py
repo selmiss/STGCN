@@ -136,14 +136,14 @@ def data_preparate(args, device):
     return n_vertex, zscore, train_iter, val_iter, test_iter
 
 
-def prepare_model(args, blocks, n_vertex):
+def prepare_model(args, blocks, n_vertex, n_internal=200):
     loss = nn.MSELoss()
     es = earlystopping.EarlyStopping(mode='min', min_delta=0.0, patience=args.patience)
 
     if args.graph_conv_type == 'cheb_graph_conv':
-        model = models.STGCNChebGraphConv(args, blocks, n_vertex).to(device)
+        model = models.STGCNChebGraphConv(args, blocks, n_internal, n_vertex).to(device)
     else:
-        model = models.STGCNGraphConv(args, blocks, n_vertex).to(device)
+        model = models.STGCNGraphConv(args, blocks, n_internal, n_vertex).to(device)
 
     if args.opt == "rmsprop":
         optimizer = optim.RMSprop(model.parameters(), lr=args.lr, weight_decay=args.weight_decay_rate)
@@ -234,8 +234,8 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
-    # load_model_from_checkpoint(model, 'checkpoints/tensor(0.2687)_weights.pth')
+    load_model_from_checkpoint(model, 'checkpoints/tensor(0.2687)_weights.pth')
 
-    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/ori200")
+    # train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/ori200")
 
     test(zscore, loss, model, test_iter, args)
