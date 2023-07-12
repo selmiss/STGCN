@@ -95,6 +95,7 @@ def data_preparate(args, device):
     adj, n_vertex = dataloader.load_adj(args.dataset)
 
     img = adj.A
+    
     gso_image = Image.fromarray(img * 255)
     gso_image.show()
     gso_image = gso_image.resize((200, 200))
