@@ -101,7 +101,7 @@ def data_preparate(args, device):
     plt.figure()
     plt.subplot(1, 2, 1)
     plt.imshow(gso_image)
-    gso_image = gso_image.resize((200, 200))
+    # gso_image = gso_image.resize((200, 200))
     plt.subplot(1, 2, 2)
     plt.imshow(gso_image)
     plt.show()
@@ -153,7 +153,7 @@ def data_preparate(args, device):
     return n_vertex, zscore, train_iter, val_iter, test_iter
 
 
-def prepare_model(args, blocks, n_vertex, n_internal=200):
+def prepare_model(args, blocks, n_vertex, n_internal=207):
     loss = nn.MSELoss()
     es = earlystopping.EarlyStopping(mode='min', min_delta=0.0, patience=args.patience)
 
@@ -252,8 +252,8 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
-    # load_model_from_checkpoint(model, 'checkpoints/ori200/0.2615_metr-la.pth')
+    # load_model_from_checkpoint(model, 'checkpoints/ori200encoder/0.3301_metr-la.pth')
 
-    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/ori200encoder")
+    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/ori200encoder/")
 
     test(zscore, loss, model, test_iter, args)
