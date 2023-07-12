@@ -33,15 +33,15 @@ class decoder(nn.Module):
 
 
 if __name__ == "__main__":
-    input_size = 100
-    hidden_size = 10
+    input_size = 207
+    hidden_size = 200
 
     # 创建自编码器模型
     model = encoder(input_size, hidden_size)
     model_de = decoder(hidden_size, input_size)
 
     # 创建输入数据（假设长度为100）
-    input_data = torch.randn(input_size)
+    input_data = torch.randn(32, 1, 12, input_size)
 
     # 前向传播
     encoded = model(input_data)
@@ -50,3 +50,8 @@ if __name__ == "__main__":
     print("原始输入: ", input_data)
     print("解码后的输出: ", encoded.shape)
     print("解码后的输出: ", decoded.shape)
+    input_data = torch.randn(10, 10)
+    print(input_data.shape)
+    input_data.resize(30, 30)
+    print(input_data.shape)
+    

@@ -7,13 +7,13 @@ import tqdm
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
-
+from PIL import Image
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils as utils
-
 from script import dataloader, utility, earlystopping
+from scipy import sparse
 from model import models
 
 
@@ -93,13 +93,23 @@ def get_parameters():
 
 def data_preparate(args, device):    
     adj, n_vertex = dataloader.load_adj(args.dataset)
+
+    img = adj.A
+    gso_image = Image.fromarray(img * 255)
+    gso_image.show()
+    gso_image = gso_image.resize((200, 200))
+    img_arr = np.asarray(gso_image) / 255
+    adj = sparse.csr_matrix(img_arr)
+
     gso = utility.calc_gso(adj, args.gso_type)
+    
     if args.graph_conv_type == 'cheb_graph_conv':
         gso = utility.calc_chebynet_gso(gso)
     gso = gso.toarray()
     gso = gso.astype(dtype=np.float32)
-    args.gso = torch.from_numpy(gso).to(device)
 
+    args.gso = torch.from_numpy(gso).to(device)
+    
     dataset_path = './data'
     dataset_path = os.path.join(dataset_path, args.dataset)
     data_col = pd.read_csv(os.path.join(dataset_path, 'vel.csv')).shape[0]
@@ -167,6 +177,7 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, sav
         l_sum, n = 0.0, 0  # 'l_sum' is epoch sum loss, 'n' is epoch instance number
         model.train()
         for x, y in tqdm.tqdm(train_iter):
+
             y_pred = model(x).view(len(x), -1)  # [batch_size, num_nodes]
             l = loss(y_pred, y)
             optimizer.zero_grad()
