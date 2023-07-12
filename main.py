@@ -54,7 +54,7 @@ def get_parameters():
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
     parser.add_argument('--weight_decay_rate', type=float, default=0.0005, help='weight decay (L2 penalty)')
     parser.add_argument('--batch_size', type=int, default=32)
-    parser.add_argument('--epochs', type=int, default=10000, help='epochs, default as 10000')
+    parser.add_argument('--epochs', type=int, default=200, help='epochs, default as 10000')
     parser.add_argument('--opt', type=str, default='adam', help='optimizer, default as adam')
     parser.add_argument('--step_size', type=int, default=10)
     parser.add_argument('--gamma', type=float, default=0.95)
@@ -182,7 +182,7 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, sav
             format(epoch+1, optimizer.param_groups[0]['lr'], l_sum / n, val_loss, gpu_mem_alloc))
 
         if val_loss < lost_least:
-            checkpoint_name = str(val_loss) + "_weights.pth"
+            checkpoint_name = str(val_loss.item()) + args.dataset + ".pth"
             lost_least = val_loss
             save_path = os.path.join(save_dir, checkpoint_name)
             torch.save(model.state_dict(), save_path)
@@ -236,6 +236,6 @@ if __name__ == "__main__":
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
     load_model_from_checkpoint(model, 'checkpoints/tensor(0.2687)_weights.pth')
 
-    # train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter)
+    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./ori_200_metr_la")
 
     test(zscore, loss, model, test_iter, args)
