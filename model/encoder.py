@@ -44,7 +44,6 @@ class encoder(nn.Module):
         super(encoder, self).__init__()
         self.encoder = nn.Sequential(
             nn.Linear(input_size, hidden_size),
-            nn.ReLU(),
             # nn.Linear(256, hidden_size),
             # nn.ReLU()
         )
@@ -59,7 +58,7 @@ class decoder(nn.Module):
         super(decoder, self).__init__()
         self.decoder = nn.Sequential(
             nn.Linear(hidden_size, input_size),
-            nn.ReLU(),
+
             # nn.Linear(256, input_size),
             # nn.ReLU()
         )
