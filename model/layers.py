@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.init as init
 
+
 class Align(nn.Module):
     def __init__(self, c_in, c_out):
         super(Align, self).__init__()

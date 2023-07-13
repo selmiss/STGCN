@@ -96,18 +96,18 @@ def data_preparate(args, device):
     adj, n_vertex = dataloader.load_adj(args.dataset)
 
     img = adj.A
-
+    img = img[:200, :200]
     gso_image = Image.fromarray(img * 255)
-
-    plt.figure()
-    plt.subplot(1, 2, 1)
-    plt.imshow(gso_image)
-    # gso_image = gso_image.resize((200, 200))
-    plt.subplot(1, 2, 2)
-    plt.imshow(gso_image)
-    plt.show()
-    img_arr = np.asarray(gso_image) / 255
-    adj = sparse.csr_matrix(img_arr)
+    gso_image.show()
+    # plt.figure()
+    # plt.subplot(1, 2, 1)
+    # plt.imshow(gso_image)
+    # # gso_image = gso_image.resize((200, 200))
+    # plt.subplot(1, 2, 2)
+    # plt.imshow(gso_image)
+    # plt.show()
+    # img_arr = np.asarray(gso_image) / 255
+    adj = sparse.csr_matrix(img)
 
     gso = utility.calc_gso(adj, args.gso_type)
     
@@ -130,6 +130,7 @@ def data_preparate(args, device):
     len_train = int(data_col - len_val - len_test)
 
     train, val, test = dataloader.load_data(args.dataset, len_train, len_val)
+
     # (23991, 207) raw data
 
     zscore = preprocessing.StandardScaler()
@@ -137,6 +138,10 @@ def data_preparate(args, device):
     train = zscore.fit_transform(train)
     val = zscore.transform(val)
     test = zscore.transform(test)
+
+    train = train[:, :200]
+    val = val[:, :200]
+    test = test[:, :200]
 
     x_train, y_train = dataloader.data_transform(train, args.n_his, args.n_pred, device)
     # print(x_train.shape, y_train.shape, y_train[0])
@@ -154,7 +159,7 @@ def data_preparate(args, device):
     return n_vertex, zscore, train_iter, val_iter, test_iter
 
 
-def prepare_model(args, blocks, n_vertex, n_internal=207):
+def prepare_model(args, blocks, n_vertex, n_internal=200):
     loss = nn.MSELoss()
     es = earlystopping.EarlyStopping(mode='min', min_delta=0.0, patience=args.patience)
 
