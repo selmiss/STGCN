@@ -44,8 +44,8 @@ def get_parameters():
     parser.add_argument('--n_his', type=int, default=12)
     parser.add_argument('--n_pred', type=int, default=3, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
-    parser.add_argument('--Kt', type=int, default=2)
-    parser.add_argument('--stblock_num', type=int, default=3)
+    parser.add_argument('--Kt', type=int, default=3)
+    parser.add_argument('--stblock_num', type=int, default=2)
     parser.add_argument('--act_func', type=str, default='glu', choices=['glu', 'gtu'])
     parser.add_argument('--Ks', type=int, default=3, choices=[3, 2])
     parser.add_argument('--graph_conv_type', type=str, default='cheb_graph_conv', choices=['cheb_graph_conv', 'graph_conv'])
@@ -96,6 +96,7 @@ def data_preparate(args, device):
     adj, n_vertex = dataloader.load_adj(args.dataset)
 
     img = adj.A
+
     img = img[:200, :200]
     gso_image = Image.fromarray(img * 255)
     gso_image.show()
@@ -132,6 +133,9 @@ def data_preparate(args, device):
     train, val, test = dataloader.load_data(args.dataset, len_train, len_val)
 
     # (23991, 207) raw data
+    train = train.iloc[:, :200]
+    val = val.iloc[:, :200]
+    test = test.iloc[:, :200]
 
     zscore = preprocessing.StandardScaler()
     # (23991, 207) standard data
@@ -139,9 +143,6 @@ def data_preparate(args, device):
     val = zscore.transform(val)
     test = zscore.transform(test)
 
-    train = train[:, :200]
-    val = val[:, :200]
-    test = test[:, :200]
 
     x_train, y_train = dataloader.data_transform(train, args.n_his, args.n_pred, device)
     # print(x_train.shape, y_train.shape, y_train[0])
@@ -232,6 +233,7 @@ def val(model, val_iter):
 def test(zscore, loss, model, test_iter, args):
     model.eval()
     test_MSE = utility.evaluate_model(model, loss, test_iter)
+    print("ok1")
     test_MAE, test_RMSE, test_WMAPE = utility.evaluate_metric(model, test_iter, zscore)
     # utility.evaluate_graph(model, test_iter, zscore)
     print(f'Dataset {args.dataset:s} | Test loss {test_MSE:.6f} | MAE {test_MAE:.6f} | RMSE {test_RMSE:.6f} | WMAPE {test_WMAPE:.8f}')
@@ -257,9 +259,9 @@ if __name__ == "__main__":
 
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
-    loss, es, model, optimizer, scheduler = prepare_model(args, blocks, n_vertex)
-    # load_model_from_checkpoint(model, 'checkpoints/ori200/0.2615_metr-la.pth')
+    loss, es, model, optimizer, scheduler = prepare_model(args, blocks, 200)
+    load_model_from_checkpoint(model, 'checkpoints/pemsd7-m/0.1628_pemsd7-m.pth')
 
-    train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/ori200encoder")
+    # train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/pemsd7-m")
 
     test(zscore, loss, model, test_iter, args)
