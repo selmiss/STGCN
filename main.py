@@ -259,7 +259,7 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, 207)
-    load_model_from_checkpoint(model, 'checkpoints/pems-bay/0.1754_pems-bay.pth')
+    load_model_from_checkpoint(model, 'checkpoints/ori200encoder/0.2636_metr-la.pth')
 
     # train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/pems-bay/")
 
