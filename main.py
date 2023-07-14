@@ -13,7 +13,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils as utils
-from script import dataloader, utility, earlystopping
+from script import dataloader, utility, earlystopping, gpruning
 from scipy import sparse
 from model import models
 
@@ -36,7 +36,7 @@ def set_env(seed):
     torch.use_deterministic_algorithms(True)
 
 ckp = "./checkpoints/stgcn-pemsd7-15/0.155_pemsd7-m.pth"
-ckp_save = "./checkpoints/stgcn-pemsd7-30"
+ckp_save = "./checkpoints/gpstg-metr-la-30"
 if_train = True
 if_load = not if_train
 def get_parameters():
@@ -45,7 +45,7 @@ def get_parameters():
     parser.add_argument('--seed', type=int, default=42, help='set the random seed for stabilizing experiment results')
     parser.add_argument('--dataset', type=str, default='metr-la', choices=['metr-la', 'pems-bay', 'pemsd7-m'])
     parser.add_argument('--n_his', type=int, default=12)
-    parser.add_argument('--n_pred', type=int, default=6, help='the number of time interval for predcition, default as 3')
+    parser.add_argument('--n_pred', type=int, default=3, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
     parser.add_argument('--Kt', type=int, default=3)
     parser.add_argument('--stblock_num', type=int, default=2)
@@ -95,32 +95,7 @@ def get_parameters():
     return args, device, blocks
 
 
-def data_preparate(args, device):    
-    adj, n_vertex = dataloader.load_adj(args.dataset)
-
-    img = adj.A
-
-    img = img[:200, :200]
-    gso_image = Image.fromarray(img * 255)
-    gso_image.show()
-    # plt.figure()
-    # plt.subplot(1, 2, 1)
-    # plt.imshow(gso_image)
-    # # gso_image = gso_image.resize((200, 200))
-    # plt.subplot(1, 2, 2)
-    # plt.imshow(gso_image)
-    # plt.show()
-    # img_arr = np.asarray(gso_image) / 255
-    adj = sparse.csr_matrix(img)
-
-    gso = utility.calc_gso(adj, args.gso_type)
-    
-    if args.graph_conv_type == 'cheb_graph_conv':
-        gso = utility.calc_chebynet_gso(gso)
-    gso = gso.toarray()
-    gso = gso.astype(dtype=np.float32)
-
-    args.gso = torch.from_numpy(gso).to(device)
+def data_preparate(args, device):
     
     dataset_path = './data'
     dataset_path = os.path.join(dataset_path, args.dataset)
@@ -133,12 +108,37 @@ def data_preparate(args, device):
     len_test = int(math.floor(data_col * val_and_test_rate))
     len_train = int(data_col - len_val - len_test)
 
-    train, val, test = dataloader.load_data(args.dataset, len_train, len_val)
 
-    # (23991, 207) raw data
-    train = train.iloc[:, :200]
-    val = val.iloc[:, :200]
-    test = test.iloc[:, :200]
+    
+    
+    # train, val, test = dataloader.load_data(args.dataset, len_train, len_val)
+
+    # # (23991, 207) raw data
+    # train = train.iloc[:, :200]
+    # val = val.iloc[:, :200]
+    # test = test.iloc[:, :200]
+        
+    adj, n_vertex = dataloader.load_adj(args.dataset)
+
+    img = adj.A
+    # img = img[:200, :200]
+    
+    train, val, test, img = gpruning.pruning(args.dataset, img, 2, 200, len_train, len_val)
+    gso_image = Image.fromarray(img * 255)
+    gso_image.show()
+
+    adj = sparse.csr_matrix(img)
+
+    gso = utility.calc_gso(adj, args.gso_type)
+    
+    if args.graph_conv_type == 'cheb_graph_conv':
+        gso = utility.calc_chebynet_gso(gso)
+    gso = gso.toarray()
+    gso = gso.astype(dtype=np.float32)
+
+    args.gso = torch.from_numpy(gso).to(device)
+    
+    
 
     zscore = preprocessing.StandardScaler()
     # (23991, 207) standard data
@@ -190,6 +190,8 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, sav
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
     lost_least = 10
+    train_loss_list = []
+    val_loss_list = []
     for epoch in range(args.epochs):
         l_sum, n = 0.0, 0  # 'l_sum' is epoch sum loss, 'n' is epoch instance number
         model.train()
@@ -208,14 +210,17 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, sav
         gpu_mem_alloc = torch.cuda.max_memory_allocated() / 1000000 if torch.cuda.is_available() else 0
         print('Epoch: {:03d} | Lr: {:.20f} |Train loss: {:.6f} | Val loss: {:.6f} | GPU occupy: {:.6f} MiB'.\
             format(epoch+1, optimizer.param_groups[0]['lr'], l_sum / n, val_loss, gpu_mem_alloc))
-
+        train_loss_list.append(l_sum / n)
+        val_loss_list.append(val_loss)
         if val_loss < lost_least:
             checkpoint_name = str(round(val_loss.item(),4)) + "_" + args.dataset + ".pth"
             lost_least = val_loss
             save_path = os.path.join(save_dir, checkpoint_name)
             torch.save(model.state_dict(), save_path)
-
+        
         if es.step(val_loss):
+            np.save(os.path.join(save_dir, "train_loss.npy"), np.array(train_loss_list))
+            np.save(os.path.join(save_dir, "val_loss.npy"), np.array(train_loss_list))
             print('Early stopping.')
             break
 
