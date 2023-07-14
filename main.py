@@ -261,6 +261,6 @@ if __name__ == "__main__":
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, 207)
     load_model_from_checkpoint(model, 'checkpoints/ori200encoder/0.2636_metr-la.pth')
 
-    # train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/pems-bay/")
+    # train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/pemsd7-m")
 
     test(zscore, loss, model, test_iter, args)
