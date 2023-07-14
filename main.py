@@ -35,14 +35,17 @@ def set_env(seed):
     torch.backends.cudnn.deterministic = True
     torch.use_deterministic_algorithms(True)
 
-
+ckp = "./checkpoints/pems-bay/0.1754_pems-bay.pth"
+ckp_save = "./checkpoints/pems-bay-n"
+if_train = True
+if_load = not if_train
 def get_parameters():
     parser = argparse.ArgumentParser(description='STGCN')
     parser.add_argument('--enable_cuda', type=bool, default=True, help='enable CUDA, default as True')
     parser.add_argument('--seed', type=int, default=42, help='set the random seed for stabilizing experiment results')
     parser.add_argument('--dataset', type=str, default='metr-la', choices=['metr-la', 'pems-bay', 'pemsd7-m'])
     parser.add_argument('--n_his', type=int, default=12)
-    parser.add_argument('--n_pred', type=int, default=3, help='the number of time interval for predcition, default as 3')
+    parser.add_argument('--n_pred', type=int, default=15, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
     parser.add_argument('--Kt', type=int, default=3)
     parser.add_argument('--stblock_num', type=int, default=2)
@@ -259,8 +262,9 @@ if __name__ == "__main__":
     args, device, blocks = get_parameters()
     n_vertex, zscore, train_iter, val_iter, test_iter = data_preparate(args, device)
     loss, es, model, optimizer, scheduler = prepare_model(args, blocks, 207)
-    load_model_from_checkpoint(model, 'checkpoints/ori200encoder/0.2636_metr-la.pth')
-
-    # train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, "./checkpoints/pemsd7-m")
+    if if_load:
+        load_model_from_checkpoint(model, ckp)
+    if if_train:
+        train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, ckp_save)
 
     test(zscore, loss, model, test_iter, args)
