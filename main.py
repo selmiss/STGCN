@@ -35,10 +35,10 @@ def set_env(seed):
     torch.backends.cudnn.deterministic = True
     torch.use_deterministic_algorithms(True)
 
-ckp = "./checkpoints/stgcn-pemsd7-15/0.155_pemsd7-m.pth"
-ckp_save = "./checkpoints/gpstg-metr-la-30"
+ckp = "./checkpoints/gpstg-metr-la-15/0.1388_metr-la.pth"
+ckp_save = "./checkpoints/gpstg-pemsd7-15"
 if_train = True
-if_load = not if_train
+if_load = False
 def get_parameters():
     parser = argparse.ArgumentParser(description='STGCN')
     parser.add_argument('--enable_cuda', type=bool, default=True, help='enable CUDA, default as True')
@@ -107,19 +107,13 @@ def data_preparate(args, device):
     len_val = int(math.floor(data_col * val_and_test_rate))
     len_test = int(math.floor(data_col * val_and_test_rate))
     len_train = int(data_col - len_val - len_test)
-
-
-    
-    
     # train, val, test = dataloader.load_data(args.dataset, len_train, len_val)
-
     # # (23991, 207) raw data
     # train = train.iloc[:, :200]
     # val = val.iloc[:, :200]
     # test = test.iloc[:, :200]
         
     adj, n_vertex = dataloader.load_adj(args.dataset)
-
     img = adj.A
     # img = img[:200, :200]
     
