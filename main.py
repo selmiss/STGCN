@@ -38,14 +38,14 @@ def set_env(seed):
 ckp = "./checkpoints/stgcn-pemsd7-15/0.155_pemsd7-m.pth"
 ckp_save = "./checkpoints/gpstg-pems-bay-15"
 if_train = True
-if_load = not if_train
+if_load = False
 def get_parameters():
     parser = argparse.ArgumentParser(description='STGCN')
     parser.add_argument('--enable_cuda', type=bool, default=True, help='enable CUDA, default as True')
     parser.add_argument('--seed', type=int, default=42, help='set the random seed for stabilizing experiment results')
     parser.add_argument('--dataset', type=str, default='metr-la', choices=['metr-la', 'pems-bay', 'pemsd7-m'])
     parser.add_argument('--n_his', type=int, default=12)
-    parser.add_argument('--n_pred', type=int, default=15, help='the number of time interval for predcition, default as 3')
+    parser.add_argument('--n_pred', type=int, default=3, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
     parser.add_argument('--Kt', type=int, default=3)
     parser.add_argument('--stblock_num', type=int, default=2)
@@ -107,19 +107,13 @@ def data_preparate(args, device):
     len_val = int(math.floor(data_col * val_and_test_rate))
     len_test = int(math.floor(data_col * val_and_test_rate))
     len_train = int(data_col - len_val - len_test)
-
-
-    
-    
     # train, val, test = dataloader.load_data(args.dataset, len_train, len_val)
-
     # # (23991, 207) raw data
     # train = train.iloc[:, :200]
     # val = val.iloc[:, :200]
     # test = test.iloc[:, :200]
         
     adj, n_vertex = dataloader.load_adj(args.dataset)
-
     img = adj.A
     # img = img[:200, :200]
     
