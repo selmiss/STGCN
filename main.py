@@ -46,7 +46,7 @@ def get_parameters():
     parser.add_argument('--dataset', type=str, default='metr-la', choices=['metr-la', 'pems-bay', 'pemsd7-m'])
     parser.add_argument('--n_his', type=int, default=12)
     parser.add_argument('--tf_rate', type=int, default=100)
-    parser.add_argument('--n_pred', type=int, default=1, help='the number of time interval for predcition, default as 3')
+    parser.add_argument('--n_pred', type=int, default=3, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
     parser.add_argument('--Kt', type=int, default=3)
     parser.add_argument('--stblock_num', type=int, default=2)

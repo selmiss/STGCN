@@ -38,12 +38,12 @@ if __name__ == "__main__":
     import numpy as np
 
     # 假设有两个损失函数下降曲线
-    loss_curve1 = np.load("./checkpoints/gpstg-pems-bay-15/train_loss.npy")
-    loss_curve2 = np.load("./checkpoints/gpstg-pems-bay-15/val_loss.npy")
-    loss_curve3 = [0.5 for i in range(172)]
-    print(loss_curve1[:10], loss_curve2[:10])
+    loss_curve1 = np.load("./checkpoints/loss_record/train_loss.npy")
+    loss_curve2 = np.load("./checkpoints/loss_record/val_loss.npy")
+    loss_curve1 = np.insert(loss_curve1, 0, 0.5)
+    loss_curve2 = np.insert(loss_curve2, 0, 0.5)
     # 损失函数的标签
-    labels = ['Train loss', 'Val loss', '3']
+    labels = ['Train loss', 'Val loss']
 
     # 调用函数进行绘图
-    plot_loss_curves([loss_curve1, loss_curve2, loss_curve3], labels)
+    plot_loss_curves([loss_curve1, loss_curve2], labels)
