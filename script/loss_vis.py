@@ -28,7 +28,7 @@ def plot_loss_curves(loss_curves, labels):
 
     # 添加图例
     ax.legend()
-    plt.title('Train & Test Loss on Metr-la(30min)')
+    plt.title('Transfer Learning on Pemsd7-m(30min)')
     # 显示图形
     plt.show()
     plt.savefig("loss.jpg")
@@ -38,10 +38,10 @@ if __name__ == "__main__":
     import numpy as np
 
     # 假设有两个损失函数下降曲线
-    loss_curve1 = np.load("./checkpoints/loss_record/train-gpstg-metr-30-50.npy")
-    loss_curve2 = np.load("./checkpoints/loss_record/val-gpstg-metr-30-50.npy")
-    loss_curve1 = np.insert(loss_curve1, 0, 0.6)
-    loss_curve2 = np.insert(loss_curve2, 0, 0.5)
+    loss_curve1 = np.load("./checkpoints/loss_record/train_loss.npy")[:]
+    loss_curve2 = np.load("./checkpoints/loss_record/val_loss.npy")[:]
+    loss_curve1 = np.insert(loss_curve1, 0, 0.4)
+    loss_curve2 = np.insert(loss_curve2, 0, 0.4)
     # 损失函数的标签
     labels = ['Train Loss', 'Test Loss']
 

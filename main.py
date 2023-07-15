@@ -35,7 +35,7 @@ def set_env(seed):
     torch.backends.cudnn.deterministic = True
     torch.use_deterministic_algorithms(True)
 
-ckp = "./checkpoints/gpstg-metr-la-15/0.1337_metr-la.pth"
+ckp = "./checkpoints/gpstg-metr-la-30/0.2692_metr-la.pth"
 ckp_save = "./checkpoints/loss_record"
 if_train = True
 if_load = True
@@ -46,7 +46,7 @@ def get_parameters():
     parser.add_argument('--dataset', type=str, default='metr-la', choices=['metr-la', 'pems-bay', 'pemsd7-m'])
     parser.add_argument('--n_his', type=int, default=12)
     parser.add_argument('--tf_rate', type=int, default=100)
-    parser.add_argument('--n_pred', type=int, default=3, help='the number of time interval for predcition, default as 3')
+    parser.add_argument('--n_pred', type=int, default=6, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
     parser.add_argument('--Kt', type=int, default=3)
     parser.add_argument('--stblock_num', type=int, default=2)
@@ -221,6 +221,7 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, sav
             np.save(os.path.join(save_dir, "val_loss.npy"), np.array(val_loss_list))
             print('Early stopping.')
             break
+    torch.save(model.state_dict(), save_path)
     np.save(os.path.join(save_dir, "train_loss.npy"), np.array(train_loss_list))
     np.save(os.path.join(save_dir, "val_loss.npy"), np.array(val_loss_list))
 
@@ -241,7 +242,7 @@ def test(zscore, loss, model, test_iter, args):
     model.eval()
     test_MSE = utility.evaluate_model(model, loss, test_iter)
     test_MAE, test_RMSE, test_WMAPE = utility.evaluate_metric(model, test_iter, zscore)
-    # utility.evaluate_graph(model, test_iter, zscore)
+    utility.evaluate_graph(model, test_iter, zscore)
     print(f'Dataset {args.dataset:s} | Test loss {test_MSE:.6f} | MAE {test_MAE:.6f} | RMSE {test_RMSE:.6f} | WMAPE {test_WMAPE:.8f}')
 
 
