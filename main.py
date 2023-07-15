@@ -35,18 +35,18 @@ def set_env(seed):
     torch.backends.cudnn.deterministic = True
     torch.use_deterministic_algorithms(True)
 
-ckp = "./checkpoints/gpstg-metr-la-15/0.1355_metr-la.pth"
-ckp_save = "./checkpoints/new-metr-15"
+ckp = "./checkpoints/new-metr-15/0.1441_metr-la.pth"
+ckp_save = "./checkpoints/new-pemsbay-15"
 if_train = True
-if_load = False
+if_load = True
 def get_parameters():
     parser = argparse.ArgumentParser(description='STGCN')
     parser.add_argument('--enable_cuda', type=bool, default=True, help='enable CUDA, default as True')
     parser.add_argument('--seed', type=int, default=42, help='set the random seed for stabilizing experiment results')
     parser.add_argument('--dataset', type=str, default='metr-la', choices=['metr-la', 'pems-bay', 'pemsd7-m'])
     parser.add_argument('--n_his', type=int, default=12)
-    parser.add_argument('--tf_rate', type=int, default=5)
-    parser.add_argument('--n_pred', type=int, default=1, help='the number of time interval for predcition, default as 3')
+    parser.add_argument('--tf_rate', type=int, default=15)
+    parser.add_argument('--n_pred', type=int, default=30, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
     parser.add_argument('--Kt', type=int, default=3)
     parser.add_argument('--stblock_num', type=int, default=2)
