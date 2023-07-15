@@ -35,17 +35,17 @@ def set_env(seed):
     torch.backends.cudnn.deterministic = True
     torch.use_deterministic_algorithms(True)
 
-ckp = "./checkpoints/stgcn-pemsd7-15/0.155_pemsd7-m.pth"
-ckp_save = "./checkpoints/gpstg-pems-bay-30-0mean"
-if_train = True
-if_load = False
+ckp = "./checkpoints/stgcn-metr-la-15/0.1339_metr-la.pth"
+ckp_save = "./checkpoints/tf-sd7-15"
+if_train = False
+if_load = True
 def get_parameters():
     parser = argparse.ArgumentParser(description='STGCN')
     parser.add_argument('--enable_cuda', type=bool, default=True, help='enable CUDA, default as True')
     parser.add_argument('--seed', type=int, default=42, help='set the random seed for stabilizing experiment results')
     parser.add_argument('--dataset', type=str, default='metr-la', choices=['metr-la', 'pems-bay', 'pemsd7-m'])
-    parser.add_argument('--n_his', type=int, default=24)
-    parser.add_argument('--n_pred', type=int, default=30, help='the number of time interval for predcition, default as 3')
+    parser.add_argument('--n_his', type=int, default=12)
+    parser.add_argument('--n_pred', type=int, default=1, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
     parser.add_argument('--Kt', type=int, default=3)
     parser.add_argument('--stblock_num', type=int, default=2)
@@ -102,7 +102,7 @@ def data_preparate(args, device):
     data_col = pd.read_csv(os.path.join(dataset_path, 'vel.csv')).shape[0]
     # recommended dataset split rate as train: val: test = 60: 20: 20, 70: 15: 15 or 80: 10: 10
     # using dataset split rate as train: val: test = 70: 15: 15
-    val_and_test_rate = 0.15
+    val_and_test_rate = 0.4
 
     len_val = int(math.floor(data_col * val_and_test_rate))
     len_test = int(math.floor(data_col * val_and_test_rate))
