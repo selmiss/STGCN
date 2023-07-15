@@ -35,9 +35,9 @@ def set_env(seed):
     torch.backends.cudnn.deterministic = True
     torch.use_deterministic_algorithms(True)
 
-ckp = "./checkpoints/stgcn-metr-la-15/0.1339_metr-la.pth"
+ckp = "./checkpoints/gpstg-metr-la-15/0.1355_metr-la.pth"
 ckp_save = "./checkpoints/tf-sd7-15"
-if_train = False
+if_train = True
 if_load = True
 def get_parameters():
     parser = argparse.ArgumentParser(description='STGCN')
@@ -45,7 +45,8 @@ def get_parameters():
     parser.add_argument('--seed', type=int, default=42, help='set the random seed for stabilizing experiment results')
     parser.add_argument('--dataset', type=str, default='metr-la', choices=['metr-la', 'pems-bay', 'pemsd7-m'])
     parser.add_argument('--n_his', type=int, default=12)
-    parser.add_argument('--n_pred', type=int, default=1, help='the number of time interval for predcition, default as 3')
+    parser.add_argument('--tf_rate', type=int, default=5)
+    parser.add_argument('--n_pred', type=int, default=3, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
     parser.add_argument('--Kt', type=int, default=3)
     parser.add_argument('--stblock_num', type=int, default=2)
@@ -58,7 +59,7 @@ def get_parameters():
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
     parser.add_argument('--weight_decay_rate', type=float, default=0.0005, help='weight decay (L2 penalty)')
     parser.add_argument('--batch_size', type=int, default=32)
-    parser.add_argument('--epochs', type=int, default=200, help='epochs, default as 10000')
+    parser.add_argument('--epochs', type=int, default=50, help='epochs, default as 10000')
     parser.add_argument('--opt', type=str, default='adam', help='optimizer, default as adam')
     parser.add_argument('--step_size', type=int, default=10)
     parser.add_argument('--gamma', type=float, default=0.95)
@@ -102,7 +103,7 @@ def data_preparate(args, device):
     data_col = pd.read_csv(os.path.join(dataset_path, 'vel.csv')).shape[0]
     # recommended dataset split rate as train: val: test = 60: 20: 20, 70: 15: 15 or 80: 10: 10
     # using dataset split rate as train: val: test = 70: 15: 15
-    val_and_test_rate = 0.4
+    val_and_test_rate = 0.15
 
     len_val = int(math.floor(data_col * val_and_test_rate))
     len_test = int(math.floor(data_col * val_and_test_rate))
@@ -139,6 +140,9 @@ def data_preparate(args, device):
     train = zscore.fit_transform(train)
     val = zscore.transform(val)
     test = zscore.transform(test)
+    
+    train = train[:int(len(train) * args.tf_rate /100)]
+    val = train[:int(len(val) * args.tf_rate /100)]
 
 
     x_train, y_train = dataloader.data_transform(train, args.n_his, args.n_pred, device)

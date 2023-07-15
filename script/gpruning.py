@@ -5,7 +5,7 @@ import math
 import numpy as np
 
 
-def pruning(dataset, adj_matrix, mean_rate, verdex, len_train, len_val):
+def pruning(dataset, adj_matrix, mean_rate, verdex, len_train, len_val, tf_rate=5):
     dataset_path = './data'
     dataset_path = os.path.join(dataset_path, dataset)
     data_col = pd.read_csv(os.path.join(dataset_path, 'vel.csv')).shape[0]
