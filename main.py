@@ -36,17 +36,17 @@ def set_env(seed):
     torch.use_deterministic_algorithms(True)
 
 ckp = "./checkpoints/stgcn-metr-la-15/0.1337_metr-la.pth"
-ckp_save = "./checkpoints/stg-tf-pemsd7-15"
+ckp_save = "./checkpoints/loss_record"
 if_train = True
-if_load = True
+if_load = False
 def get_parameters():
     parser = argparse.ArgumentParser(description='STGCN')
     parser.add_argument('--enable_cuda', type=bool, default=True, help='enable CUDA, default as True')
     parser.add_argument('--seed', type=int, default=42, help='set the random seed for stabilizing experiment results')
     parser.add_argument('--dataset', type=str, default='metr-la', choices=['metr-la', 'pems-bay', 'pemsd7-m'])
     parser.add_argument('--n_his', type=int, default=12)
-    parser.add_argument('--tf_rate', type=int, default=5)
-    parser.add_argument('--n_pred', type=int, default=15, help='the number of time interval for predcition, default as 3')
+    parser.add_argument('--tf_rate', type=int, default=100)
+    parser.add_argument('--n_pred', type=int, default=1, help='the number of time interval for predcition, default as 3')
     parser.add_argument('--time_intvl', type=int, default=5)
     parser.add_argument('--Kt', type=int, default=3)
     parser.add_argument('--stblock_num', type=int, default=2)
@@ -214,14 +214,15 @@ def train(loss, args, optimizer, scheduler, es, model, train_iter, val_iter, sav
             checkpoint_name = str(round(val_loss.item(),4)) + "_" + args.dataset + ".pth"
             lost_least = val_loss
             save_path = os.path.join(save_dir, checkpoint_name)
-            torch.save(model.state_dict(), save_path)
+            # torch.save(model.state_dict(), save_path)
         
         if es.step(val_loss):
             np.save(os.path.join(save_dir, "train_loss.npy"), np.array(train_loss_list))
-            np.save(os.path.join(save_dir, "val_loss.npy"), np.array(train_loss_list))
+            np.save(os.path.join(save_dir, "val_loss.npy"), np.array(val_loss_list))
             print('Early stopping.')
             break
-
+    np.save(os.path.join(save_dir, "train_loss.npy"), np.array(train_loss_list))
+    np.save(os.path.join(save_dir, "val_loss.npy"), np.array(val_loss_list))
 
 @torch.no_grad()
 def val(model, val_iter):

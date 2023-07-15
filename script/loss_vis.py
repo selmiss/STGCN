@@ -22,8 +22,9 @@ def plot_loss_curves(loss_curves, labels):
     ax.set_ylabel('loss')
 
     # 绘制每个损失函数的曲线
-    for i, loss_curve in enumerate(loss_curves):
-        ax.plot(x, loss_curve, label=labels[i])
+    for loss_curve, label in zip(loss_curves, labels):
+        ax.plot(x, loss_curve, label=label)
+
 
     # 添加图例
     ax.legend()
@@ -37,11 +38,12 @@ if __name__ == "__main__":
     import numpy as np
 
     # 假设有两个损失函数下降曲线
-    loss_curve1 = np.load("./checkpoints/gpstg-metr-la-15/train_loss0.npy")
-    loss_curve2 = np.load("./checkpoints/gpstg-metr-la-15/val_loss0.npy")
-
+    loss_curve1 = np.load("./checkpoints/gpstg-pems-bay-15/train_loss.npy")
+    loss_curve2 = np.load("./checkpoints/gpstg-pems-bay-15/val_loss.npy")
+    loss_curve3 = [0.5 for i in range(172)]
+    print(loss_curve1[:10], loss_curve2[:10])
     # 损失函数的标签
-    labels = ['Train loss', 'Val loss']
+    labels = ['Train loss', 'Val loss', '3']
 
     # 调用函数进行绘图
-    plot_loss_curves([loss_curve1, loss_curve2], labels)
+    plot_loss_curves([loss_curve1, loss_curve2, loss_curve3], labels)
