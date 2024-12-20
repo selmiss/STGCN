@@ -1,15 +1,5 @@
-# Spatio-Temporal Graph Convolutional Networks
-[![issues](https://img.shields.io/github/issues/hazdzz/STGCN)](https://github.com/hazdzz/STGCN/issues)
-[![forks](https://img.shields.io/github/forks/hazdzz/STGCN)](https://github.com/hazdzz/STGCN/network/members)
-[![stars](https://img.shields.io/github/stars/hazdzz/STGCN)](https://github.com/hazdzz/STGCN/stargazers)
-[![License](https://img.shields.io/github/license/hazdzz/STGCN)](./LICENSE)
+# Graph Pruning Based Spatial and Temporal Graph Convolutional Network with Transfer Learning for Traffic Prediction
 
-## About
-The PyTorch version of STGCN implemented for the paper *Spatio-Temporal Graph Convolutional Networks:
-A Deep Learning Framework for Traffic Forecasting*.
-
-## Paper
-https://arxiv.org/abs/1709.04875
 
 ## Related works
 1. TCN: [*An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling*](https://arxiv.org/abs/1803.01271)
@@ -32,8 +22,6 @@ https://arxiv.org/abs/1709.04875
 Using the formula from [ChebNet](https://arxiv.org/abs/1606.09375)：
 <img src="./figure/weighted_adjacency_matrix.png" style="zoom:100%" />
 
-## Model structure
-<img src="./figure/stgcn_model_structure.png" style="zoom:100%" />
 
 ## Differents of code between mine and author's
 1. Fix bugs 
